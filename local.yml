@@ -6,8 +6,6 @@ volumes:
 services:
   postgres:
     image: postgres:9.6
-    volumes:
-      - postgres_data_dev:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=concepttoclinic
 
@@ -25,6 +23,7 @@ services:
       - SECRET_KEY=notverysecret
       - DEBUG=True
       - DJANGO_SETTINGS_MODULE=config.settings.local
+      - DATABASE_URL=postgres://concepttoclinic:postgres@postgres:5432/concepttoclinic
     volumes:
       - ./interface/:/app
       - ./tests/assets/test_image_data/small:/images
@@ -46,25 +45,4 @@ services:
     ports:
       - "8001:8001"
 
-  compile_docs:
-      restart: always
-      build:
-        context: .
-        dockerfile: ./compose/prediction/Dockerfile-dev
-      volumes:
-        - ./:/app
-      command: make -C /app/docs html
 
-  documentation:
-    build:
-      context: .
-      dockerfile: ./compose/prediction/Dockerfile-dev
-    depends_on:
-      - compile_docs
-    working_dir: /app/docs/_build/html
-    volumes:
-      - ./docs/_build/html:/app/docs/_build/html
-      - ./:/app
-    command: python -m http.server
-    ports:
-      - "8002:8000"

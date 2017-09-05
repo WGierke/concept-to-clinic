@@ -1,5 +1,3 @@
-from rest_framework import serializers
-
 from backend.cases.models import (
     Case,
     Candidate,
@@ -9,6 +7,7 @@ from backend.images.models import (
     ImageSeries,
     ImageLocation
 )
+from rest_framework import serializers
 
 
 class ImageSeriesSerializer(serializers.HyperlinkedModelSerializer):
@@ -24,12 +23,18 @@ class ImageLocationSerializer(serializers.ModelSerializer):
 
 
 class CaseSerializer(serializers.HyperlinkedModelSerializer):
+    series = ImageSeriesSerializer()
+
     class Meta:
         model = Case
-        fields = '__all__'
+        fields = ('series',)
         read_only_fields = ('created',)
 
-    series = ImageSeriesSerializer()
+    def create(self, validated_data):
+        series_data = validated_data.pop('series')
+        image_series = ImageSeries.objects.create(**series_data)
+        case = Case.objects.create(series_id=image_series.id, **validated_data)
+        return case
 
 
 class CandidateSerializer(serializers.HyperlinkedModelSerializer):

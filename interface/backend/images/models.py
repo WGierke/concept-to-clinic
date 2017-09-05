@@ -1,7 +1,8 @@
+import glob
+
+import dicom
 from django.db import models
 from django.utils._os import safe_join
-import dicom
-import glob
 
 
 class ImageSeries(models.Model):
@@ -13,6 +14,16 @@ class ImageSeries(models.Model):
     series_instance_uid = models.CharField(max_length=256)
 
     uri = models.CharField(max_length=512)
+
+    acquisition_date = models.CharField(max_length=64)
+
+    age = models.IntegerField()
+
+    sex = models.CharField(max_length=6)
+
+    peak_kilovoltage = models.IntegerField()
+
+    # milliampere = models.IntegerField()
 
     def get_or_create(uri):
         """
@@ -30,10 +41,16 @@ class ImageSeries(models.Model):
         plan = dicom.read_file(safe_join(uri, file_))
         patient_id = plan.PatientID
         series_instance_uid = plan.SeriesInstanceUID
+        acquisition_date = plan.AcquisitionDate
+        age = plan.PatientAge
+        sex = plan.PatientSex
+        kvp = plan.KVP
+
         return ImageSeries.objects.get_or_create(
             patient_id=patient_id,
             series_instance_uid=series_instance_uid,
-            uri=uri)
+            uri=uri, acquisition_date=acquisition_date,
+            age=age, sex=sex, peak_kilovoltage=kvp)
 
 
 class ImageLocation(models.Model):
