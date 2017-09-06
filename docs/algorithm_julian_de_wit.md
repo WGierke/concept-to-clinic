@@ -4,8 +4,8 @@
 <!-- A brief (2-3 sentences) summary of the algorithm -->
 
 ## Source
-**Author:** [Julian de Wit](http://juliandewit.github.io/kaggle-ndsb2017)
-**Repository:** [Github](https://github.com/juliandewit/kaggle_ndsb2017)
+**Author:** [Julian de Wit](http://juliandewit.github.io/kaggle-ndsb2017)      
+**Repository:** [Github](https://github.com/juliandewit/kaggle_ndsb2017)       
 2nd place at the Data Science Bowl 2017, when combined with the Daniel Hammack algorithm.
 
 ## License
@@ -25,13 +25,19 @@
 
 **Dependency packages:**
 ````
+glob
+SimpleITK # conda install -c https://conda.anaconda.org/simpleitk SimpleITK
+beautifulsoup4 # conda install beautifulsoup4 
+lxml # conda install lxml
+numpy
+pandas
+scipy
+scikit-learn==0.19.0
+skimage
+opencv3 # conda install -c https://conda.anaconda.org/menpo opencv3
+pydicom
 keras==2.0.6
 tensorflow-gpu==1.3.0
-scikit-learn==0.19.0
-pydicom
-simpleitk
-beatifulsoup
-opencv
 xgboost==0.6a
 ````
 
@@ -75,7 +81,7 @@ Download the trained_models.rar file, decompress, and put in the ./models folder
 
 | Metric   | Score |
 |----------|-------|
-| Accuracy |       |
+| Log-Loss | ~ 0.44|
 
 ## Use cases
 <!-- List strengths and weaknesses of the algorithm. -->
