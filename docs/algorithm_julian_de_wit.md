@@ -6,7 +6,7 @@
 ## Source
 **Author:** [Julian de Wit](http://juliandewit.github.io/kaggle-ndsb2017)      
 **Repository:** [Github](https://github.com/juliandewit/kaggle_ndsb2017)       
-2nd place at the Data Science Bowl 2017, when combined with the Daniel Hammack algorithm.
+2nd place at the Data Science Bowl 2017, when ensembled with the Daniel Hammack algorithm.
 
 ## License
 [MIT License](http://opensource.org/licenses/MIT)
@@ -15,7 +15,7 @@
 | Dependency |   Name   | Version  |
 |------------|----------|----------|
 | Language   | Python   | 3.5 | 
-| ML engine  | Keras    | 2.0.6 | 
+| ML engine  | Keras    | 2.0.8 | 
 | ML backend | Tensorflow| 1.3.0 | 
 | OS         | Windows/Ubuntu ||
 | Processor  | CPU      | yes  |
@@ -25,20 +25,19 @@
 
 **Dependency packages:**
 ````
-glob
-SimpleITK # conda install -c https://conda.anaconda.org/simpleitk SimpleITK
-beautifulsoup4 # conda install beautifulsoup4 
-lxml # conda install lxml
-numpy
-pandas
-scipy
+beautifulsoup4==4.6.0
+lxml==3.8.0
+numpy==1.13.1
+pandas==0.20.3
+scipy==0.19.1
 scikit-learn==0.19.0
-skimage
-opencv3 # conda install -c https://conda.anaconda.org/menpo opencv3
-pydicom
-keras==2.0.6
+scikit-image==0.13.0
 tensorflow-gpu==1.3.0
-xgboost==0.6a
+Keras==2.0.8
+xgboost==0.6a2
+opencv-python==3.3.0.10
+pydicom==0.9.9
+SimpleITK==1.0.1
 ````
 
 ## Algorithm design
