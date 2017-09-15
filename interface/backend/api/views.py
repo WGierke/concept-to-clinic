@@ -20,6 +20,7 @@ from rest_framework.decorators import renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.views.decorators.csrf import csrf_exempt
 
 
 class CaseViewSet(viewsets.ModelViewSet):
@@ -116,3 +117,16 @@ def case_report(request, case_id, format=None):
     case = get_object_or_404(Case, pk=case_id)
 
     return Response(CaseSerializer(case).data)
+
+@csrf_exempt
+@api_view(['POST'])
+def nodule_update(request, nodule_id):
+    try:
+        lung_orientation = json.loads(request.body)['lung_orientation']
+    except Exception as e:
+        return Response({'response': "An error occurred: {}".format(request.body)})
+    if lung_orientation is None:
+        lung_orientation = 'none'
+    Nodule.objects.filter(pk=nodule_id).update(lung_orientation=Nodule.LungOrientation[lung_orientation].value)
+    return Response(
+        {'response': "Lung orientation of nodule {} has been changed to '{}'".format(nodule_id, lung_orientation)})

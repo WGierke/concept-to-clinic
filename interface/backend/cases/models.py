@@ -40,7 +40,7 @@ def django_enum(cls):
 
 class Nodule(models.Model):
     """
-    Actual nodule, either confirmed as concerning from prediciton or manually added.
+    Actual nodule, either confirmed as concerning from prediction or manually added.
     """
 
     @unique  # ensures all variables are unique
