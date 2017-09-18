@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import renderers
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
@@ -20,7 +21,6 @@ from rest_framework.decorators import renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.views.decorators.csrf import csrf_exempt
 
 
 class CaseViewSet(viewsets.ModelViewSet):
@@ -117,6 +117,7 @@ def case_report(request, case_id, format=None):
     case = get_object_or_404(Case, pk=case_id)
 
     return Response(CaseSerializer(case).data)
+
 
 @csrf_exempt
 @api_view(['POST'])
