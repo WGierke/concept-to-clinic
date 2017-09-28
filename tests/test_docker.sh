@@ -7,7 +7,7 @@
 set -ex
 
 # run the model service's tests
-docker-compose -f local.yml run prediction pytest -rs
+docker-compose -f local.yml run prediction pytest -rs src/tests/test_annotation_cube.py
 
 # run the backend API tests
 docker-compose -f local.yml run interface python manage.py test
