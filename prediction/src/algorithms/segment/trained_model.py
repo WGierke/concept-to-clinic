@@ -17,7 +17,7 @@ import scipy.ndimage
 def predict(dicom_path, centroids):
     """ Predicts nodule boundaries.
 
-    Given a pth to a DICOM image and a list of centroids
+    Given a path to DICOM images and a list of centroids
         (1) load the segmentation model from its serialized state
         (2) pre-process the dicom data into whatever format the segmentation
             model expects
