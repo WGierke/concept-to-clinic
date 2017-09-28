@@ -2,9 +2,7 @@ import glob
 
 import numpy as np
 import pylidc as pl
-from src.algorithms.identify.prediction import load_patient_images
-from src.preprocess.lung_segmentation import save_lung_segments, get_z_range
-from src.preprocess import load_ct as ld
+from src.algorithms.segment.src.model import unet_model_3d
 
 
 def get_dicom_paths():
@@ -19,9 +17,6 @@ def prepare_training_data_cubes():
     Iterate over all local LIDC images, fetch the annotations and save one cube of CT image including the annotation
     and one cube with the segmented annotation in a binary mask."""
 
-    with open('/root/.pylidcrc', 'w+') as f:
-        f.write("[dicom]\npath = /images_full\nwarn = True")
-
     dicom_paths = get_dicom_paths()
     for path in dicom_paths:
         directories = path.split('/')
@@ -34,6 +29,18 @@ def prepare_training_data_cubes():
             np.save("annotation_{}_output.npy".format(annotation.id), cube_segmentation)
 
 
+def test_train_model():
+    input_cube = np.load("../annotation_84_input.npy")
+    output_cube = np.load("../annotation_84_output.npy")
+    input_cube = np.expand_dims(input_cube, axis=0)
+    output_cube = np.expand_dims(output_cube, axis=0)
+    input_cube = np.expand_dims(input_cube, axis=0)
+    output_cube = np.expand_dims(output_cube, axis=0)
+
+    model = unet_model_3d((64, 64, 64, 1))
+    #model.fit(input_cube, output_cube)
+
+
 def cube_show_slider(cube, axis=2, **kwargs):
     """
     Display a 3d ndarray with a slider to move along the third dimension.
@@ -42,7 +49,7 @@ def cube_show_slider(cube, axis=2, **kwargs):
     (Kudos to http://nbarbey.github.io/2011/07/08/matplotlib-slider.html)
     """
     import matplotlib.pyplot as plt
-    from matplotlib.widgets import Slider, Button, RadioButtons
+    from matplotlib.widgets import Slider
 
     # check dim
     if not cube.ndim == 3:
@@ -78,8 +85,6 @@ def cube_show_slider(cube, axis=2, **kwargs):
     slider.on_changed(update)
 
     plt.show()
-
-
 
 # def test_cube_segmentation_mask_crop():
 #     """Test whether the annotations of the LIDC images are inside the segmented lung masks.
