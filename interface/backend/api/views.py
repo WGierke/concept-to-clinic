@@ -1,7 +1,7 @@
 import json
 import mimetypes
 import os
-
+import dicom
 from backend.api import serializers
 from backend.cases.models import (
     Case,
@@ -9,6 +9,8 @@ from backend.cases.models import (
     Nodule,
     CaseSerializer
 )
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from backend.images.models import ImageSeries
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -20,7 +22,6 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 
 class CaseViewSet(viewsets.ModelViewSet):
@@ -41,6 +42,24 @@ class NoduleViewSet(viewsets.ModelViewSet):
 class ImageSeriesViewSet(viewsets.ModelViewSet):
     queryset = ImageSeries.objects.all()
     serializer_class = serializers.ImageSeriesSerializer
+
+
+class ImageMetadataApiView(APIView):   
+
+    def get(self, request):
+        '''
+        Get metadata of a DICOM image including the image in base64 format.
+        Example: .../api/images/metadata?dicom_location=FULL_PATH_TO_IMAGE
+        ---
+        parameters:
+            - name: dicom_location
+            description: full location of the image
+            required: true
+            type: string
+        '''
+        path = request.GET['dicom_location']
+        ds = dicom.read_file(path, force=True)
+        return Response(serializers.DicomMetadataSerializer(ds).data)
 
 
 class ImageAvailableApiView(APIView):
