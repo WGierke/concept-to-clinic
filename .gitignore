@@ -65,3 +65,5 @@ prediction/data/*
 
 # ignore data
 data/
+prediction/src/algorithms/segment/assets/annotation_*.npy
+
