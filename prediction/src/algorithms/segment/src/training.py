@@ -12,8 +12,8 @@ def train():
     CUBE_IMAGE_SHAPE = (64, 64, 64, 1)
     current_dir = os.path.dirname(os.path.realpath(__file__))
     assets_dir = os.path.abspath(os.path.join(current_dir, '../assets'))
-    inputs = glob.glob(assets_dir + "annotation_*_input.npy")
-    outputs = glob.glob(assets_dir + "annotation_*_output.npy")
+    inputs = glob.glob(os.path.join(assets_dir, "annotation_*_input.npy"))
+    outputs = glob.glob(os.path.join(assets_dir, "annotation_*_output.npy"))
     input_data = np.ndarray((len(inputs), *CUBE_IMAGE_SHAPE))
     output_data = np.ndarray((len(inputs), *CUBE_IMAGE_SHAPE))
 
@@ -24,13 +24,15 @@ def train():
         # Expand dimensions
         input_cube = np.expand_dims(input_cube, axis=0)
         output_cube = np.expand_dims(output_cube, axis=0)
-        # Trailing channel is necessary for tensorflow
+        # Trailing channel is necessary for Tensorflow
         input_cube = input_cube.reshape(*CUBE_IMAGE_SHAPE)
         output_cube = output_cube.reshape(*CUBE_IMAGE_SHAPE)
 
         input_data[index, :, :, :] = input_cube
         output_data[index, :, :, :] = output_cube
 
-    model = unet_model_3d(CUBE_IMAGE_SHAPE, downsize_filters_factor=5)
-    model_checkpoint = ModelCheckpoint(assets_dir + 'best.hdf5', monitor='loss', verbose=1, save_best_only=True)
-    model.fit(input_data, output_data, callbacks=[model_checkpoint])
+    model = unet_model_3d(CUBE_IMAGE_SHAPE, downsize_filters_factor=32)
+    model_checkpoint = ModelCheckpoint(os.path.join(assets_dir, 'best.hdf5'), monitor='loss', verbose=1, save_best_only=True)
+    print(input_data.shape)
+    print(output_data.shape)
+    model.fit(input_data, output_data, callbacks=[model_checkpoint], epochs=10)
