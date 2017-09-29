@@ -1,49 +1,41 @@
-import glob
-
-import numpy as np
-import pylidc as pl
-from src.algorithms.segment.src.model import unet_model_3d
+from src.algorithms.segment.src.data_generation import prepare_training_data_cubes
+from src.algorithms.segment.src.training import train
 
 
-def get_dicom_paths():
-    """Return DICOM paths to all LIDC directories
-    e.g. ['../images_full/LIDC-IDRI-0001/1.3.6.1.4.1.14519.5.2.1.6279.6001.298806137288633453246975630178/' \
-          '1.3.6.1.4.1.14519.5.2.1.6279.6001.179049373636438705059720603192']"""
-    return glob.glob("../images_full/LIDC-IDRI-*/**/**")
+def test_3d_unet():
+    prepare_training_data_cubes()
+    train()
 
 
-def prepare_training_data_cubes():
-    """Save cubes of nodules and nodule segmentations.
-    Iterate over all local LIDC images, fetch the annotations and save one cube of CT image including the annotation
-    and one cube with the segmented annotation in a binary mask."""
-
-    dicom_paths = get_dicom_paths()
-    dicom_paths = glob.glob("tests/assets/test_image_data/full/LIDC-IDRI-*/**/**")
-    for path in dicom_paths:
-        directories = path.split('/')
-        lidc_id = directories[4]
-        print("Handling ", lidc_id)
-        scan = pl.query(pl.Scan).filter(pl.Scan.patient_id == lidc_id).first()
-        for annotation in scan.annotations:
-            cube_volume, cube_segmentation = annotation.uniform_cubic_resample(side_length=63)
-            np.save("annotation_{}_input.npy".format(annotation.id), cube_volume)
-            np.save("annotation_{}_output.npy".format(annotation.id), cube_segmentation)
-
-
-def test_train_model():
-    input_cube = np.load("annotation_84_input.npy")
-    output_cube = np.load("annotation_84_output.npy")
-    # Expand dimensions
-    input_cube = np.expand_dims(input_cube, axis=0)
-    output_cube = np.expand_dims(output_cube, axis=0)
-    input_cube = np.expand_dims(input_cube, axis=0)
-    output_cube = np.expand_dims(output_cube, axis=0)
-    # Trailing channel
-    input_cube = input_cube.reshape(1, 64, 64, 64, 1)
-    output_cube = output_cube.reshape(1, 64, 64, 64, 1)
-
-    model = unet_model_3d((64, 64, 64, 1))
-    model.fit(input_cube, output_cube)
+# def test_train_model():
+#     ASSETS_DIR = '../assets/'
+#     inputs = ["annotation_84_input.npy", "annotation_90_input.npy"]
+#     outputs = ["annotation_84_output.npy", "annotation_90_output.npy"]
+#
+#     input_data = np.array((len(inputs), 64, 64, 64, 1))
+#     output_data = np.array((len(inputs), 64, 64, 64, 1))
+#
+#     for index, in_file, out_file in enumerate(zip(inputs, outputs)):
+#         input_cube = np.load(in_file)
+#         output_cube = np.load(out_file)
+#
+#         # Expand dimensions
+#         input_cube = np.expand_dims(input_cube, axis=0)
+#         output_cube = np.expand_dims(output_cube, axis=0)
+#         # Trailing channel is necessary for tensorflow
+#         input_cube = input_cube.reshape(64, 64, 64, 1)
+#         output_cube = output_cube.reshape(64, 64, 64, 1)
+#
+#         input_data[index] = input_cube
+#         output_data[index] = output_cube
+#
+#
+#     model = unet_model_3d((64, 64, 64, 1), downsize_filters_factor=5)
+#     model.fit(input_data, output_data)
+#
+#     # # Predict
+#     # predicted = model.predict(input_cube)
+#     # np.save("predicted.npy", predicted)
 
 
 def cube_show_slider(cube, axis=2, **kwargs):
