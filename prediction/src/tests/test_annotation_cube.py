@@ -18,9 +18,10 @@ def prepare_training_data_cubes():
     and one cube with the segmented annotation in a binary mask."""
 
     dicom_paths = get_dicom_paths()
+    dicom_paths = glob.glob("tests/assets/test_image_data/full/LIDC-IDRI-*/**/**")
     for path in dicom_paths:
         directories = path.split('/')
-        lidc_id = directories[2]
+        lidc_id = directories[4]
         print("Handling ", lidc_id)
         scan = pl.query(pl.Scan).filter(pl.Scan.patient_id == lidc_id).first()
         for annotation in scan.annotations:
@@ -30,15 +31,19 @@ def prepare_training_data_cubes():
 
 
 def test_train_model():
-    input_cube = np.load("../annotation_84_input.npy")
-    output_cube = np.load("../annotation_84_output.npy")
+    input_cube = np.load("annotation_84_input.npy")
+    output_cube = np.load("annotation_84_output.npy")
+    # Expand dimensions
     input_cube = np.expand_dims(input_cube, axis=0)
     output_cube = np.expand_dims(output_cube, axis=0)
     input_cube = np.expand_dims(input_cube, axis=0)
     output_cube = np.expand_dims(output_cube, axis=0)
+    # Trailing channel
+    input_cube = input_cube.reshape(1, 64, 64, 64, 1)
+    output_cube = output_cube.reshape(1, 64, 64, 64, 1)
 
     model = unet_model_3d((64, 64, 64, 1))
-    #model.fit(input_cube, output_cube)
+    model.fit(input_cube, output_cube)
 
 
 def cube_show_slider(cube, axis=2, **kwargs):

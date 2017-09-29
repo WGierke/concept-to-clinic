@@ -14,7 +14,7 @@ def unet_model_3d(input_shape, downsize_filters_factor=1, pool_size=(2, 2, 2), n
                   initial_learning_rate=0.00001, deconvolution=False):
     """
     Builds the 3D UNet Keras model.
-    :param input_shape: Shape of the input data (n_chanels, x_size, y_size, z_size).
+    :param input_shape: Shape of the input data (x_size, y_size, z_size, n_channels).
     :param downsize_filters_factor: Factor to which to reduce the number of filters. Making this value larger will
     reduce the amount of memory the model will need during training.
     :param pool_size: Pool size for the max pooling operations.
@@ -42,19 +42,19 @@ def unet_model_3d(input_shape, downsize_filters_factor=1, pool_size=(2, 2, 2), n
 
     up5 = get_upconv(pool_size=pool_size, deconvolution=deconvolution, depth=2,
                      nb_filters=int(512/downsize_filters_factor), image_shape=input_shape[-3:])(conv4)
-    up5 = concatenate([up5, conv3], axis=1)
+    up5 = concatenate([up5, conv3], axis=4)
     conv5 = Conv3D(int(256/downsize_filters_factor), (3, 3, 3), activation='relu', padding='same')(up5)
     conv5 = Conv3D(int(256/downsize_filters_factor), (3, 3, 3), activation='relu', padding='same')(conv5)
 
     up6 = get_upconv(pool_size=pool_size, deconvolution=deconvolution, depth=1,
                      nb_filters=int(256/downsize_filters_factor), image_shape=input_shape[-3:])(conv5)
-    up6 = concatenate([up6, conv2], axis=1)
+    up6 = concatenate([up6, conv2], axis=4)
     conv6 = Conv3D(int(128/downsize_filters_factor), (3, 3, 3), activation='relu', padding='same')(up6)
     conv6 = Conv3D(int(128/downsize_filters_factor), (3, 3, 3), activation='relu', padding='same')(conv6)
 
     up7 = get_upconv(pool_size=pool_size, deconvolution=deconvolution, depth=0,
                      nb_filters=int(128/downsize_filters_factor), image_shape=input_shape[-3:])(conv6)
-    up7 = concatenate([up7, conv1], axis=1)
+    up7 = concatenate([up7, conv1], axis=4)
     conv7 = Conv3D(int(64/downsize_filters_factor), (3, 3, 3), activation='relu', padding='same')(up7)
     conv7 = Conv3D(int(64/downsize_filters_factor), (3, 3, 3), activation='relu', padding='same')(conv7)
 
