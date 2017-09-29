@@ -11,7 +11,7 @@ except ImportError:
 
 
 def unet_model_3d(input_shape, downsize_filters_factor=1, pool_size=(2, 2, 2), n_labels=1,
-                  initial_learning_rate=0.00001, deconvolution=False):
+                  initial_learning_rate=0.01, deconvolution=False):
     """
     Builds the 3D UNet Keras model.
     :param input_shape: Shape of the input data (x_size, y_size, z_size, n_channels).

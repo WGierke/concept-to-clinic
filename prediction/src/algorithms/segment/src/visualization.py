@@ -1,8 +1,7 @@
 """This file contains methods that help to visualize the training cubes of annotations"""
 
-import os
-
-import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
 
 
 def cube_show_slider(cube, axis=2, is_mask=False, **kwargs):
@@ -58,13 +57,7 @@ def cube_show_slider(cube, axis=2, is_mask=False, **kwargs):
     plt.show()
 
 
-def display_training_pair(path, annotation_id, axis=2, **kwargs):
-    import matplotlib.pyplot as plt
-    from matplotlib.widgets import Slider
-
-    input_cube = np.load(os.path.join(path, "annotation_{}_input.npy".format(annotation_id)))
-    output_cube = np.load(os.path.join(path, "annotation_{}_output.npy".format(annotation_id)))
-
+def display_training_pair(input_cube, output_cube, axis=2, **kwargs):
     # check dims
     if not input_cube.ndim == 3 or not output_cube.ndim == 3:
         raise ValueError("cube should be an ndarray with ndim == 3")

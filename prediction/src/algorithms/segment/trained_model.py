@@ -12,6 +12,8 @@ import os
 import numpy as np
 import scipy.ndimage
 from prediction.src.preprocess.load_ct import load_ct, MetaData
+from prediction.src.algorithms.segment.src.training import get_best_model_path
+from keras.models import load_model
 
 
 def predict(dicom_path, centroids):
@@ -38,10 +40,24 @@ def predict(dicom_path, centroids):
             {'binary_mask_path': str,
              'volumes': list[float]}
     """
-    load_ct(dicom_path)
-    segment_path = os.path.join(os.path.dirname(__file__),
-                                'assets', 'test_mask.npy')
-    volumes = calculate_volume(segment_path, centroids)
+    voxel_data, meta = load_ct(dicom_path)
+    model = load_model(get_best_model_path)
+    input_cubes = np.ndarray((len(centroids), 64, 64, 64, 1))
+    result_dict = []
+
+    for index, centroid in enumerate(centroids):
+        x, y, z = centroid['x'], centroid['y'], centroid['z']
+        input_cubes[index] = voxel_data[x-32:x+32, y-32:y+32, z-32:z+32] #TODO
+
+    output_cubes = model.predict(input_cubes)
+    for index, output_cube in enumerate(output_cubes):
+        x, y, z = centroids[index]['x'], centroids[index]['y'], centroids[index]['z']
+        segment_path = os.path.join(os.path.dirname(__file__), 'assets', "centroid-{}-{}-{}.npy".format(x, y, z))
+        np.save(segment_path)
+        volumes = calculate_volume(segment_path, centroids)
+        result_dict.append({})
+
+
     return_value = {
         'binary_mask_path': segment_path,
         'volumes': volumes
