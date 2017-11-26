@@ -10,6 +10,7 @@ from backend.cases.models import (
     Nodule,
     CaseSerializer
 )
+
 from backend.images.models import ImageSeries
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -22,22 +23,32 @@ from rest_framework.views import APIView
 from ..cases import enums
 
 
-class CaseViewSet(viewsets.ModelViewSet):
+class ViewSetBase(viewsets.ModelViewSet):
+    def get_serializer_context(self):
+        context = super(ViewSetBase, self).get_serializer_context()
+
+        # getting rid of absulute URLs
+        context.update({'request': None})
+
+        return context
+
+
+class CaseViewSet(ViewSetBase):
     queryset = Case.objects.all()
     serializer_class = serializers.CaseSerializer
 
 
-class CandidateViewSet(viewsets.ModelViewSet):
+class CandidateViewSet(ViewSetBase):
     queryset = Candidate.objects.all()
     serializer_class = serializers.CandidateSerializer
 
 
-class NoduleViewSet(viewsets.ModelViewSet):
+class NoduleViewSet(ViewSetBase):
     queryset = Nodule.objects.all()
     serializer_class = serializers.NoduleSerializer
 
 
-class ImageSeriesViewSet(viewsets.ModelViewSet):
+class ImageSeriesViewSet(ViewSetBase):
     queryset = ImageSeries.objects.all()
     serializer_class = serializers.ImageSeriesSerializer
 
@@ -55,7 +66,11 @@ class ImageMetadataApiView(APIView):
             type: string
         '''
         path = request.GET['dicom_location']
-        ds = dicom.read_file(path, force=True)
+        try:
+            ds = dicom.read_file(path, force=True)
+        except IOError as err:
+            print(err)
+            return Response(serializers.DicomMetadataSerializer().data)
         return Response(serializers.DicomMetadataSerializer(ds).data)
 
 
@@ -165,6 +180,27 @@ def candidate_mark(request, candidate_id):
 @api_view(['GET'])
 def candidate_dismiss(request, candidate_id):
     return Response({'response': "Candidate {} was dismissed".format(candidate_id)})
+
+
+@api_view(['POST'])
+def update_candidate_location(request, candidate_id):
+    try:
+        request_body = json.loads(request.body)
+        x = request_body['x']
+        y = request_body['y']
+        z = request_body['z']
+    except Exception as e:
+        return Response({'response': "An error occurred: {}".format(e)}, 500)
+
+    # find the candidate and update the centroid location
+    candidate = Candidate.objects.get(pk=candidate_id)
+    candidate.centroid.x = x
+    candidate.centroid.y = y
+    candidate.centroid.z = z
+
+    candidate.centroid.save()
+
+    return Response(serializers.CandidateSerializer(candidate, context={'request': None}).data)
 
 
 @api_view(['GET'])

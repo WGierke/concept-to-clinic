@@ -5,7 +5,7 @@
       <outline-nav :outlines="outlines" v-model="activeOutlineId"></outline-nav>
     </div>
 
-    <div class='col-md-9'>
+    <div class='col-md-9' ref='pdfSection'>
       <rsna-standard-template
         v-show="activeOutlineId === '#RSNA'"
         :rsna="study">
@@ -25,17 +25,6 @@
 
 </div>
 </template>
-
-<style media="screen" lang="scss" scoped>
-.offset-top {
-    margin-top: 5em;
-}
-@media screen and (max-width: 990px) {
-    .offset-top {
-        margin-top: 10em;
-    }
-}
-</style>
 
 <script>
 import OutlineNav from '../components/report-and-export/OutlineNav'
