@@ -133,7 +133,7 @@ services:
     volumes:
       - ./prediction/:/app:cached
       - ./tests/assets/test_image_data/small:/images:cached
-      - ./tests/assets/test_image_data/full:/images_full:cached
+      - ./images_full:/images_full:cached
       - ./prediction/src/algorithms/classify/assets/:/classify_models:cached
       - ./prediction/src/algorithms/identify/assets/:/identify_models:cached
       - ./data/:/app/data:cached
