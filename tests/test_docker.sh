@@ -9,7 +9,8 @@ set -ex
 # run the model service's tests
 # Coverage should ignore pip packets, files including tests and pytest
 docker-compose -f local.yml run prediction coverage run --branch --omit=/usr/local/lib/python3.6/dist-packages/*,src/tests/*,/usr/local/bin/pytest /usr/local/bin/pytest -rsx
-docker-compose -f local.yml run prediction coverage html
+docker-compose -f local.yml run prediction coverage xml
+docker-compose -f local.yml run prediction /bin/bash <(curl -s https://codecov.io/bash)
 
 # run the backend API tests
 # Coverage should ignore pip packets, files including migrations and tests
