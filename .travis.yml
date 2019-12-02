@@ -16,8 +16,6 @@ python: 3.6
 before_install:
 - echo -e "machine github.com\n  login $GITHUB_TOKEN" >> ~/.netrc
 - git lfs pull
-- sudo apt-get install -y apt-transport-https
-- sudo apt-get update
 - docker-compose -v
 - docker -v
 install:
