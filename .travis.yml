@@ -27,8 +27,7 @@ script:
 - pycodestyle interface
 - flake8 prediction
 - pycodestyle prediction
-- sh tests/test_docker.sh || true
-- cat interface/backend/images/migrations/*
+- sh tests/test_docker.sh
 notifications:
   webhooks:
   - https://app.fossa.io/hooks/travisci
