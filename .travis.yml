@@ -1,9 +1,5 @@
 sudo: required
 dist: bionic
-addons:
-  apt:
-    sources:
-      - docker-bionic
 git:
   lfs_skip_smudge: true
 env:
